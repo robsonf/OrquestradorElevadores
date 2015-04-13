@@ -1,4 +1,4 @@
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Random;
 
 public class Andar {
@@ -7,10 +7,9 @@ public class Andar {
 	public static final int PARADO = 0;
 
 	private int id;
-	private ArrayList<Pessoa> pessoas;
+	private LinkedList<Pessoa> pessoas;
 	private int statusAndar;
 	private int totalPessoas;
-	private boolean [] destinos;
 
 	public Andar() {
 		this(0,3);
@@ -19,44 +18,59 @@ public class Andar {
 	public Andar(int id, int totalPessoas) {
 		this.id = id;
 		this.totalPessoas = totalPessoas;
-		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
-		gerarPessoas();
+		adicionarPessoas();
 	}
 
-	public Andar(int id, ArrayList<Pessoa> pessoas, int statusAndar, int totalPessoas) {
+	public Andar(int id, LinkedList<Pessoa> pessoas, int statusAndar, int totalPessoas) {
 		super();
 		this.id = id;
 		this.pessoas = pessoas;
 		this.statusAndar = Andar.PARADO;
 		this.totalPessoas = totalPessoas;
-		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
-		gerarPessoas();
+		adicionarPessoas();
 	}
 
-	public void gerarPessoas(){
+	public void adicionarPessoas(){
 		Random random = new Random();
-		pessoas = new ArrayList<Pessoa>();
+		pessoas = new LinkedList<Pessoa>();
 		for(int i = 0; i < this.totalPessoas;i++){
 			int destino = -1;
 			while(destino == -1){
 				int aux = random.nextInt(Orquestrador.NUM_ANDARES);
 				if(aux != this.id){
 					destino = aux;
-					if(!this.destinos[destino])
-						this.destinos[destino] = true;
 				}
 			}
-			pessoas.add(new Pessoa(this.id, destino,0));
+			((LinkedList<Pessoa>) pessoas).push(new Pessoa(this.id, destino,0));
 		}
 	}
-
-	public boolean [] getDestinos(){
-		return destinos;
+	
+	public void removerPessoas(LinkedList<Pessoa> pessoas){
+		for (Pessoa aux : pessoas) {
+			Pessoa pessoa = this.pessoas.peek();
+			if(pessoa != null && pessoa.getDestino() == aux.getDestino() && pessoa.getOrigem() == aux.getOrigem()){
+				this.pessoas.poll();
+			}
+		}
 	}
 	
+	public LinkedList<Pessoa> getPessoas() {
+		LinkedList<Pessoa> aux = new LinkedList<Pessoa>();
+		for (Pessoa pessoa : pessoas) {
+			try {
+				aux.add((Pessoa)pessoa.clone());
+			} catch (CloneNotSupportedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return aux;
+	}
+
 	@Override
 	public String toString() {
-		String aux = String.format("\tId: %d Status: %d Pessoas [", id, statusAndar);
+//		String aux = String.format("\tId: %d Status: %d Pessoas [", id, statusAndar);
+		String aux = String.format("\tId: %d Pessoas [", id);
 		for (Pessoa p : pessoas) {
 			aux += p.toString() + ", ";
 		}

@@ -22,8 +22,50 @@ public class Pessoa {
 		this.tempo++;
 	}
 	
+	public int getDestino() {
+		return destino;
+	}
+
+	
+	public int getOrigem() {
+		return origem;
+	}
+
 	@Override
 	public String toString() {
-		return String.format("Origem: %d Destino: %d Tempo: %d", origem, destino, tempo);
+		return String.format("(O:%d,D:%d,T:%d)", origem, destino, tempo);
+	}
+	
+	@Override
+	protected Pessoa clone() throws CloneNotSupportedException {
+		return new Pessoa(this.origem, this.destino, this.tempo);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + destino;
+		result = prime * result + origem;
+		result = prime * result + tempo;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Pessoa other = (Pessoa) obj;
+		if (destino != other.destino)
+			return false;
+		if (origem != other.origem)
+			return false;
+		if (tempo != other.tempo)
+			return false;
+		return true;
 	}
 }
