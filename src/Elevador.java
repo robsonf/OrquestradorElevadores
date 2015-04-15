@@ -1,10 +1,11 @@
+import java.util.Iterator;
 import java.util.LinkedList;
 
 
 public class Elevador {
-	public static final int SOBE = 1;
-	public static final int DESCE = -1;
-	public static final int PARADO = 0;
+	public static final int SUBIR = 1;
+	public static final int DESCER = -1;
+	public static final int PARAR = 0;
 	public static final int CAPACIDADE_MAX = 3;
 	
 	private int id;
@@ -15,8 +16,9 @@ public class Elevador {
 	private LinkedList<Pessoa> pessoas;
 	
 	public Elevador(int id) {
-		this(id, 0, null, Elevador.PARADO, 0);
+		this(id, 0, null, Elevador.PARAR, 0);
 		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
+		this.status = SUBIR;
 	}
 	public Elevador(int id, int andarAtual, boolean [] destinos, int status, int andaresPercorridos) {
 		super();
@@ -28,12 +30,7 @@ public class Elevador {
 		this.pessoas = new LinkedList<Pessoa>();
 	}
 	public void adicionarPessoa(Pessoa pessoa){
-		try {
-			pessoas.add(pessoa.clone());
-		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		pessoas.add(pessoa);
 		atualizarDestinos();
 	}
 	public void removerPessoas(LinkedList<Pessoa> pessoas){
@@ -43,12 +40,22 @@ public class Elevador {
 		}
 		atualizarDestinos();
 	}
+
+	public int removerPessoas(){
+		int total = 0;
+		Iterator<Pessoa> pessoas = this.pessoas.iterator();
+		while (pessoas.hasNext()) {
+			if(pessoas.next().getDestino() == this.andarAtual){
+				pessoas.remove();
+				total++;
+			}
+		}
+		atualizarDestinos();
+		return total;
+	}
 	
 	public boolean estaLotado(){
-		if(pessoas.size()==CAPACIDADE_MAX)
-			return true;
-		else
-			return false;
+		return pessoas.size() == CAPACIDADE_MAX;
 	}
 	
 	public void atualizarDestinos() {
@@ -58,13 +65,26 @@ public class Elevador {
 				this.destinos[pessoa.getDestino()] = true;
 		}
 	}
-	public void atualizarStatus(int status){
-		if(status == SOBE && andarAtual < Orquestrador.NUM_ANDARES){
-			this.andarAtual++;
-			this.andaresPercorridos++;
-		}else if(status == DESCE && andarAtual > 0){
-			this.andarAtual--;
-			this.andaresPercorridos++;
+	public void atualizarAndar(int acao){
+		if(acao == SUBIR){
+			if (andarAtual < Orquestrador.NUM_ANDARES - 1){
+				this.andarAtual++;
+				this.andaresPercorridos++;
+			}else if (andarAtual == Orquestrador.NUM_ANDARES - 1){
+				System.out.println("............ULTIMO ANDAR..........");
+				this.status = DESCER;
+				this.andarAtual--;
+			}
+		}
+		if(acao == DESCER){
+			if (andarAtual > 0){
+				this.andarAtual--;
+				this.andaresPercorridos++;
+			}else if(andarAtual == 0){
+				System.out.println("............PRIMEIRO ANDAR..........");
+				this.status = SUBIR;
+				this.andarAtual++;
+			}
 		}
 	}
 	
@@ -80,9 +100,16 @@ public class Elevador {
 		}
 		return aux;
 	}
-	
+
+	public int getStatus(){
+		return this.status;
+	}
 	public int getAndarAtual() {
-		return andarAtual;
+		return this.andarAtual;
+	}
+	
+	public boolean estaVazio(){
+		return this.pessoas.size() == 0;
 	}
 	@Override
 	public String toString() {

@@ -55,16 +55,17 @@ public class Andar {
 	}
 	
 	public LinkedList<Pessoa> getPessoas() {
-		LinkedList<Pessoa> aux = new LinkedList<Pessoa>();
-		for (Pessoa pessoa : pessoas) {
-			try {
-				aux.add((Pessoa)pessoa.clone());
-			} catch (CloneNotSupportedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		return aux;
+//		LinkedList<Pessoa> aux = new LinkedList<Pessoa>();
+//		for (Pessoa pessoa : pessoas) {
+//			try {
+//				aux.add((Pessoa)pessoa.clone());
+//			} catch (CloneNotSupportedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		}
+//		return aux;
+		return this.pessoas;
 	}
 
 	@Override
