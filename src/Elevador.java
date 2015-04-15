@@ -12,20 +12,22 @@ public class Elevador {
 	private int andarAtual;
 	private boolean [] destinos;
 	private int status;
+	private int acao;
 	private int andaresPercorridos;
 	private LinkedList<Pessoa> pessoas;
 	
 	public Elevador(int id) {
-		this(id, 0, null, Elevador.PARAR, 0);
+		this(id, 0, null, Elevador.SUBIR, Elevador.SUBIR, 0);
 		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
 		this.status = SUBIR;
 	}
-	public Elevador(int id, int andarAtual, boolean [] destinos, int status, int andaresPercorridos) {
+	public Elevador(int id, int andarAtual, boolean [] destinos, int status, int acao, int andaresPercorridos) {
 		super();
 		this.id = id;
 		this.andarAtual = andarAtual;
 		this.destinos = destinos;
 		this.status = status;
+		this.acao = acao;
 		this.andaresPercorridos = andaresPercorridos;
 		this.pessoas = new LinkedList<Pessoa>();
 	}
@@ -54,10 +56,6 @@ public class Elevador {
 		return total;
 	}
 	
-	public boolean estaLotado(){
-		return pessoas.size() == CAPACIDADE_MAX;
-	}
-	
 	public void atualizarDestinos() {
 		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
 		for (Pessoa pessoa : pessoas) {
@@ -65,27 +63,31 @@ public class Elevador {
 				this.destinos[pessoa.getDestino()] = true;
 		}
 	}
-	public void atualizarAndar(int acao){
-		if(acao == SUBIR){
+	public void executarAcao(int acao){
+		if(acao == SUBIR)
+			this.andarAtual++;
+		else
+			this.andarAtual--;
+		this.andaresPercorridos++;
+	}
+	public void executarAcao(int acao, int andar){
+		if(this.status == SUBIR && acao == SUBIR){
 			if (andarAtual < Orquestrador.NUM_ANDARES - 1){
 				this.andarAtual++;
-				this.andaresPercorridos++;
-			}else if (andarAtual == Orquestrador.NUM_ANDARES - 1){
+			}else{
 				System.out.println("............ULTIMO ANDAR..........");
 				this.status = DESCER;
-				this.andarAtual--;
 			}
 		}
-		if(acao == DESCER){
+		if(this.status == DESCER && acao == DESCER){
 			if (andarAtual > 0){
 				this.andarAtual--;
-				this.andaresPercorridos++;
-			}else if(andarAtual == 0){
+			}else {
 				System.out.println("............PRIMEIRO ANDAR..........");
 				this.status = SUBIR;
-				this.andarAtual++;
 			}
 		}
+		this.andaresPercorridos++;
 	}
 	
 	public LinkedList<Pessoa> getPessoas() {
@@ -101,9 +103,18 @@ public class Elevador {
 		return aux;
 	}
 
+	public void setStatus(int status){
+		this.status = status;
+	}
+
 	public int getStatus(){
 		return this.status;
 	}
+
+	public int getAcao(){
+		return this.acao;
+	}
+	
 	public int getAndarAtual() {
 		return this.andarAtual;
 	}
@@ -111,9 +122,14 @@ public class Elevador {
 	public boolean estaVazio(){
 		return this.pessoas.size() == 0;
 	}
+
+	public boolean estaLotado(){
+		return pessoas.size() == CAPACIDADE_MAX;
+	}
+
 	@Override
 	public String toString() {
-		String aux = String.format("\tId: %d Status: %d AndarAtual: %d AndaresPercorridos: %d\nAndaresDestino:[", id, status, andarAtual, andaresPercorridos);
+		String aux = String.format("\tId: %d Status: %d AndarAtual: %d AndaresPercorridos: %d\n\tAndaresDestino:[", id, status, andarAtual, andaresPercorridos);
 		for (int i = 0; i < destinos.length; i++) {
 			if(this.destinos[i])
 				aux += i + ", ";

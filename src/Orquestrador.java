@@ -3,31 +3,27 @@ import java.util.LinkedList;
 
 public class Orquestrador {
 
-	public static final int NUM_ANDARES = 3;
-	public static final int NUM_ELEVADORES = 2;
+	public static final int NUM_ANDARES = 4;
+	public static final int NUM_ELEVADORES = 1;
 
 	private ArrayList<Andar> andares;
 	private ArrayList<Elevador> elevadores;
-	private int tempoDecorrido;
-	private int tempoTotal;
-	private int pessoasEsperando = 	0, pessoasElevador = 0;
+	private int tempoDecorrido = 0 , tempoTotal = 0, pessoasEsperando = 0, pessoasElevador = 0;
 	public Orquestrador() {
 		super();
 		andares = new ArrayList<Andar>();
-		andares.add(new Andar(0, 3));
-		andares.add(new Andar(1, 3));
-		andares.add(new Andar(2, 3));
-
 		elevadores = new ArrayList<Elevador>();
-		Elevador e1 = new Elevador(0);
-		elevadores.add(e1);
-
+		for (int i = 0; i < NUM_ANDARES; i++) {
+			andares.add(new Andar(i, 6));
+		}
+		for (int i = 0; i < NUM_ELEVADORES; i++) {
+			elevadores.add(new Elevador(i));
+		}
 
 		/*
 		 * TODO: para cada elevador verificar acao, se subir, continuar subindo, chegando no último andar, descer.
 		 * 		Se descendo, continuar descer, chegando no primeiro andar, subir.
 		 */
-		
 		
 		for (Andar andar : andares) {
 			pessoasEsperando+= andar.getPessoas().size();
@@ -47,30 +43,30 @@ public class Orquestrador {
 					pessoasEsperando--;
 					pessoasElevador++;
 				}
-//				remover pessoas do andar 0 e adicionar no elevador
-				System.out.println("###### remover pessoas do andar "+elevador.getAndarAtual() +" e adicionar no elevador ######");
+//					remover pessoas do andar atual e adicionar no elevador
+				System.out.println(String.format("###### remover pessoas do andar %d e adicionar no elevador ######", elevador.getAndarAtual()) );
 				System.out.println(this);
-	
-				// elevador sobe ou desce andar
+
+//					mover o elevador com heuristica dummy
 				if(elevador.getStatus() == Elevador.SUBIR){
 					if (andarAtual < Orquestrador.NUM_ANDARES - 1){
-						elevador.atualizarAndar(Elevador.SUBIR);	
+						elevador.executarAcao(Elevador.SUBIR);	
 					}else{
-						elevador.atualizarAndar(Elevador.DESCER);	
+						elevador.executarAcao(Elevador.DESCER);
+						elevador.setStatus(Elevador.DESCER);
 					}
-				}
-				if(elevador.getStatus() == Elevador.DESCER){
+				}else{
+//				if(elevador.getStatus() == Elevador.DESCER){
 					if (andarAtual > 0){
-						elevador.atualizarAndar(Elevador.DESCER);
+						elevador.executarAcao(Elevador.DESCER);
 					}else{
-						elevador.atualizarAndar(Elevador.SUBIR);
+						elevador.executarAcao(Elevador.SUBIR);
+						elevador.setStatus(Elevador.SUBIR);
 					}
 				}
-				
-				System.out.println("###### elevador sobe/desce um andar ######");
-				System.out.println(this);
 	
-				// remover pessoas do elevador
+				
+//				 remover pessoas do elevador
 				pessoasElevador -= elevador.removerPessoas();
 				System.out.println("###### remover pessoas do elevador ######");
 				System.out.println(this);
@@ -86,12 +82,9 @@ public class Orquestrador {
 
 	@Override
 	public String toString() {
-		// String aux =
-		// String.format("TempoDecorrido: %d TempoTotal: %d\nAndares:\n",
-		// tempoDecorrido, tempoTotal);
 		String aux = "Andares:\n";
-		for (Andar a : andares) {
-			aux += a;
+		for (int i = andares.size()-1; i >= 0; i--) {
+			aux += andares.get(i);
 		}
 		aux += "Elevadores:\n";
 		for (Elevador e : elevadores) {
