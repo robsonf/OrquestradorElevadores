@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
@@ -15,6 +16,8 @@ public class Elevador {
 	private int acao;
 	private int andaresPercorridos;
 	private LinkedList<Pessoa> pessoas;
+	private ArrayList<Integer> temposEsperaAtendidas;
+	
 	
 	public Elevador(int id) {
 		this(id, 0, null, Elevador.SUBIR, Elevador.SUBIR, 0);
@@ -30,32 +33,28 @@ public class Elevador {
 		this.acao = acao;
 		this.andaresPercorridos = andaresPercorridos;
 		this.pessoas = new LinkedList<Pessoa>();
+		this.temposEsperaAtendidas = new ArrayList<Integer>();
 	}
 	public void adicionarPessoa(Pessoa pessoa){
 		pessoas.add(pessoa);
 		atualizarDestinos();
 	}
-	public void removerPessoas(LinkedList<Pessoa> pessoas){
-		for (Pessoa aux : pessoas) {
-			if(aux.getDestino() == this.andarAtual)
-				this.pessoas.remove(aux);
-		}
-		atualizarDestinos();
-	}
-
 	public int removerPessoas(){
 		int total = 0;
 		Iterator<Pessoa> pessoas = this.pessoas.iterator();
 		while (pessoas.hasNext()) {
-			if(pessoas.next().getDestino() == this.andarAtual){
+			Pessoa pessoa = pessoas.next(); 
+			if(pessoa.getDestino() == this.andarAtual){
+				int espera = Math.abs(Orquestrador.contadorTempo - pessoa.getTempo());
 				pessoas.remove();
 				total++;
+				temposEsperaAtendidas.add(espera);
+//				System.out.printf("\nPessoa:%s , TEMPO DE ESPERA:%d, CONTADOR:%d, TEMPO:%d \n", pessoa.toString(), espera, Orquestrador.contadorTempo, pessoa.getTempo());
 			}
 		}
 		atualizarDestinos();
 		return total;
 	}
-	
 	public void atualizarDestinos() {
 		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
 		for (Pessoa pessoa : pessoas) {
@@ -89,18 +88,25 @@ public class Elevador {
 		}
 		this.andaresPercorridos++;
 	}
-	
-	public LinkedList<Pessoa> getPessoas() {
-		LinkedList<Pessoa> aux = new LinkedList<Pessoa>();
-		for (Pessoa pessoa : pessoas) {
-			try {
-				aux.add((Pessoa)pessoa.clone());
-			} catch (CloneNotSupportedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+	public int getTempoTotalAtendidas() {
+		int parcial = 0;
+		for (int decorrido : temposEsperaAtendidas) {
+			parcial += decorrido;
 		}
-		return aux;
+		return parcial;
+	}
+	public int getTempoEsperaElevador(){
+		int contador = 0;
+		for (Pessoa pessoa : pessoas) {
+			contador += Math.abs(Orquestrador.contadorTempo - pessoa.getTempo());
+		}
+		return contador;
+	}
+	public int getTotalPessoasAtendidas() {
+		return temposEsperaAtendidas.size();
+	}
+	public LinkedList<Pessoa> getPessoas() {
+		return this.pessoas;
 	}
 
 	public void setStatus(int status){
@@ -118,7 +124,11 @@ public class Elevador {
 	public int getAndarAtual() {
 		return this.andarAtual;
 	}
-	
+
+	public int getAndaresPercorridos() {
+		return this.andaresPercorridos;
+	}
+
 	public boolean estaVazio(){
 		return this.pessoas.size() == 0;
 	}

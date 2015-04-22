@@ -5,6 +5,8 @@ public class Andar {
 	public static final int SOBE = 1;
 	public static final int DESCE = -1;
 	public static final int PARADO = 0;
+	// aumenta o peso do tempo de espera para as pessoas que não foram atendidas
+	public static final int PESO_ESPERA = 2;
 
 	private int id;
 	private LinkedList<Pessoa> pessoas;
@@ -18,7 +20,7 @@ public class Andar {
 	public Andar(int id, int totalPessoas) {
 		this.id = id;
 		this.totalPessoas = totalPessoas;
-		adicionarPessoas();
+		iniciarPessoas();
 	}
 
 	public Andar(int id, LinkedList<Pessoa> pessoas, int statusAndar, int totalPessoas) {
@@ -27,22 +29,34 @@ public class Andar {
 		this.pessoas = pessoas;
 		this.statusAndar = Andar.PARADO;
 		this.totalPessoas = totalPessoas;
-		adicionarPessoas();
+		iniciarPessoas();
+	}
+
+	public void iniciarPessoas(){
+		pessoas = new LinkedList<Pessoa>();
+		for(int i = 0; i < this.totalPessoas;i++){
+			adicionarPessoas();
+		}
 	}
 
 	public void adicionarPessoas(){
 		Random random = new Random();
-		pessoas = new LinkedList<Pessoa>();
-		for(int i = 0; i < this.totalPessoas;i++){
-			int destino = -1;
-			while(destino == -1){
-				int aux = random.nextInt(Orquestrador.NUM_ANDARES);
-				if(aux != this.id){
-					destino = aux;
-				}
+		int destino = -1;
+		while(destino == -1){
+			int aux = random.nextInt(Orquestrador.NUM_ANDARES);
+			if(aux != this.id){
+				destino = aux;
 			}
-			((LinkedList<Pessoa>) pessoas).push(new Pessoa(this.id, destino,0));
 		}
+		pessoas.push(new Pessoa(this.id, destino,Orquestrador.contadorTempo));
+	}
+
+	public int tempoPessoasEsperando(){
+		int total = 0;
+		for (Pessoa pessoa : pessoas) {
+			total += (Math.abs(pessoa.getDestino() - pessoa.getOrigem()) * PESO_ESPERA) + (Orquestrador.contadorTempo - pessoa.getTempo());
+		}
+		return total;
 	}
 	
 	public void removerPessoas(LinkedList<Pessoa> pessoas){
@@ -55,16 +69,6 @@ public class Andar {
 	}
 	
 	public LinkedList<Pessoa> getPessoas() {
-//		LinkedList<Pessoa> aux = new LinkedList<Pessoa>();
-//		for (Pessoa pessoa : pessoas) {
-//			try {
-//				aux.add((Pessoa)pessoa.clone());
-//			} catch (CloneNotSupportedException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//		}
-//		return aux;
 		return this.pessoas;
 	}
 

@@ -31,6 +31,10 @@ public class Pessoa {
 		return origem;
 	}
 
+	public int getTempo() {
+		return tempo;
+	}
+	
 	@Override
 	public String toString() {
 		return String.format("(O:%d,D:%d,T:%d)", origem, destino, tempo);
