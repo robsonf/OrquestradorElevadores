@@ -12,10 +12,10 @@ public class Orquestrador {
 	 */
 	
 	public static final int NUM_ANDARES = 3;
-	public static final int NUM_ELEVADORES = 1;
+	public static final int NUM_ELEVADORES = 2;
 	// número máximo de pessoas por andar inicialmente
 	public static final int MAX_PESSOAS_POR_ANDAR = 1;
-	public static final int TEMPO_MAX_EXECUCAO = 1000;
+	public static final int TEMPO_MAX_EXECUCAO = 100;
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 50;
 	
 	public static int contadorTempo = 0;
@@ -121,7 +121,7 @@ public class Orquestrador {
 		for (int i = 0; i < elevadores.size(); i++) {
 			Elevador elevador = elevadores.get(i);
 			int parcialAndares = elevador.getAndaresPercorridos();
-			relatorio += String.format("id:%d , total Percorrido:%d \n",i, parcialAndares);
+			relatorio += String.format("Total Percorrido Elevador[%d] = %d \n",i, parcialAndares);
 			totalAndaresPercorridos += parcialAndares;
 			tempoPessoasAtendidas += elevador.getTempoTotalAtendidas();
 			totalPessoasAtendidas += elevador.getTotalPessoasAtendidas();
@@ -132,15 +132,17 @@ public class Orquestrador {
 			tempoPessoasEsperando += andar.tempoPessoasEsperando();
 			totalPessoasEsperando += andar.getPessoas().size();
 		}
-		relatorio += String.format("\nTotal pessoas atendidas:%d \n",totalPessoasAtendidas);
-		relatorio += String.format("Total pessoas no elevador:%d \n",pessoasElevador);
-		relatorio += String.format("Total pessoas esperando:%d \n",totalPessoasEsperando);
-		relatorio += String.format("Tempo total pessoas atendidas:%d \n",tempoPessoasAtendidas);
-		relatorio += String.format("Tempo total pessoas elevador:%d \n",tempoPessoasElevador);
-		relatorio += String.format("Tempo total pessoas esperando:%d \n",tempoPessoasEsperando);
+		relatorio += String.format("\nTotal andares percorridos: %d \n",totalAndaresPercorridos);
+		relatorio += String.format("Total pessoas atendidas: %d \n",totalPessoasAtendidas);
+		relatorio += String.format("Total pessoas no elevador: %d \n",pessoasElevador);
+		relatorio += String.format("Total pessoas esperando: %d \n",totalPessoasEsperando);
+		relatorio += String.format("Tempo total pessoas atendidas: %d \n",tempoPessoasAtendidas);
+		relatorio += String.format("Tempo total pessoas elevador: %d \n",tempoPessoasElevador);
+		relatorio += String.format("Tempo total pessoas esperando: %d \n",tempoPessoasEsperando);
 		double mediaEspera = ((double)(tempoPessoasAtendidas+tempoPessoasEsperando+tempoPessoasElevador))/
 				(totalPessoasAtendidas+pessoasElevador+totalPessoasEsperando);
-		relatorio += String.format("Media de espera:%.2f \n", mediaEspera);
+		relatorio += String.format("\nMedia de espera: %.2f \n", mediaEspera);
+		relatorio += String.format("Media andares percorridos: %.2f \n",((double)totalAndaresPercorridos)/elevadores.size());
 		
 		System.out.println(relatorio);
 	}
