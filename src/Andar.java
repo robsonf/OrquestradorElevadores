@@ -35,11 +35,11 @@ public class Andar {
 	public void iniciarPessoas(){
 		pessoas = new LinkedList<Pessoa>();
 		for(int i = 0; i < this.totalPessoas;i++){
-			adicionarPessoas();
+			adicionarPessoa();
 		}
 	}
 
-	public void adicionarPessoas(){
+	public void adicionarPessoa(){
 		Random random = new Random();
 		int destino = -1;
 		while(destino == -1){
@@ -68,8 +68,16 @@ public class Andar {
 		}
 	}
 	
+	public boolean estaVazio(){
+		return this.pessoas.size() == 0;
+	}
+	
 	public LinkedList<Pessoa> getPessoas() {
 		return this.pessoas;
+	}
+	
+	public int getId(){
+		return this.id;
 	}
 
 	@Override

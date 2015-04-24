@@ -4,11 +4,13 @@ public class Pessoa {
 	private int origem;
 	private int destino;
 	private int tempo;
+	private int andarAtual;
 
 	public Pessoa() {
 		this.origem = 0;
 		this.destino = 1;
 		this.tempo = 0;
+		this.andarAtual = 0;
 	}
 
 	public Pessoa(int origem, int destino, int tempo) {
@@ -16,6 +18,7 @@ public class Pessoa {
 		this.origem = origem;
 		this.destino = destino;
 		this.tempo = tempo;
+		this.andarAtual = origem;
 	}
 	
 	public void incrementaTempo(){
@@ -34,7 +37,13 @@ public class Pessoa {
 	public int getTempo() {
 		return tempo;
 	}
-	
+	public int getAndarAtual() {
+		return andarAtual;
+	}
+
+	public void setAndarAtual(int andarAtual) {
+		this.andarAtual = andarAtual;
+	}
 	@Override
 	public String toString() {
 		return String.format("(O:%d,D:%d,T:%d)", origem, destino, tempo);
