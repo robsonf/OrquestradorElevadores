@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 public class Andar {
@@ -9,7 +10,7 @@ public class Andar {
 	public static final int PESO_ESPERA = 2;
 
 	private int id;
-	private LinkedList<Pessoa> pessoas;
+	private Queue<Pessoa> pessoas;
 	private int statusAndar;
 	private int totalPessoas;
 
@@ -23,7 +24,7 @@ public class Andar {
 		iniciarPessoas();
 	}
 
-	public Andar(int id, LinkedList<Pessoa> pessoas, int statusAndar, int totalPessoas) {
+	public Andar(int id, Queue<Pessoa> pessoas, int statusAndar, int totalPessoas) {
 		super();
 		this.id = id;
 		this.pessoas = pessoas;
@@ -42,13 +43,16 @@ public class Andar {
 	public void adicionarPessoa(){
 		Random random = new Random();
 		int destino = -1;
-		while(destino == -1){
+//		while(destino == -1){
+		while(destino == -1 || destino == Orquestrador.NUM_ANDARES - 1){
 			int aux = random.nextInt(Orquestrador.NUM_ANDARES);
 			if(aux != this.id){
 				destino = aux;
 			}
 		}
-		pessoas.push(new Pessoa(this.id, destino,Orquestrador.contadorTempo));
+		if(this.id == Orquestrador.NUM_ANDARES-1)
+			return;
+		pessoas.add(new Pessoa(this.id, destino,Orquestrador.contadorTempo));
 	}
 
 	public int tempoPessoasEsperando(){
@@ -59,7 +63,7 @@ public class Andar {
 		return total;
 	}
 	
-	public void removerPessoas(LinkedList<Pessoa> pessoas){
+	public void removerPessoas(Queue<Pessoa> pessoas){
 		for (Pessoa aux : pessoas) {
 			Pessoa pessoa = this.pessoas.peek();
 			if(pessoa != null && pessoa.getDestino() == aux.getDestino() && pessoa.getOrigem() == aux.getOrigem()){
@@ -72,7 +76,7 @@ public class Andar {
 		return this.pessoas.size() == 0;
 	}
 	
-	public LinkedList<Pessoa> getPessoas() {
+	public Queue<Pessoa> getPessoas() {
 		return this.pessoas;
 	}
 	

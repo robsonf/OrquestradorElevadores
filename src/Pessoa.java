@@ -81,4 +81,15 @@ public class Pessoa {
 			return false;
 		return true;
 	}
+	
+	/*
+	 * retorna valor positivo se subir e negativo se descer
+	 */
+	public int getDirecao(){
+		int direcao = this.destino - this.origem;
+		if(direcao > 0)
+			return Elevador.SUBIR;
+		else
+			return Elevador.DESCER;
+	}
 }

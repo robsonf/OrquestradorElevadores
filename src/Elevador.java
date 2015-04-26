@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Queue;
 
 
 public class Elevador {
@@ -18,37 +19,35 @@ public class Elevador {
 	private int status;
 	private int acao;
 	private int andaresPercorridos;
-	private LinkedList<Pessoa> pessoas;
+	private Queue<Pessoa> pessoas;
 	private ArrayList<Integer> temposEsperaAtendidas;
 	private int teto;
 	private int chao;
 	private ArrayList<Andar> andares;
-
+	private Queue<Pessoa> pessoasAtendidas;
+	private Orquestrador orquestrador;
 	
 	public Elevador(int id) {
-		this(id, 0, null, Elevador.SUBIR, Elevador.SUBIR, 0, 0, Orquestrador.NUM_ANDARES-1);
-		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
-		this.status = SUBIR;
+		this(id, 0, Elevador.SUBIR, Elevador.PARAR, 0, 0, Orquestrador.NUM_ANDARES-1);
 	}
 	public Elevador(int id, int chao, int teto) {
-		this(id, chao, null, Elevador.SUBIR, Elevador.SUBIR, 0, chao, teto);
-		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
-		this.status = SUBIR;
+		this(id, chao, Elevador.SUBIR, Elevador.PARAR, 0, chao, teto);
 	}
-	public Elevador(int id, int andarAtual, boolean [] destinos, int status, int acao, int andaresPercorridos, int chao, int teto) {
+	public Elevador(int id, int andarAtual, int status, int acao, int andaresPercorridos, int chao, int teto) {
 		super();
 		this.id = id;
 		this.andarAtual = andarAtual;
-		this.destinos = destinos;
 		this.status = status;
 		this.acao = acao;
 		this.andaresPercorridos = andaresPercorridos;
 		this.pessoas = new LinkedList<Pessoa>();
+		this.pessoasAtendidas = new LinkedList<Pessoa>();
 		this.temposEsperaAtendidas = new ArrayList<Integer>();
 		this.chao = chao;
 		this.teto = teto;
 		this.listaDestinos = new LinkedHashSet<Integer>();
 		this.listaChamadas = new LinkedHashSet<Integer>();
+		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
 	}
 	public void adicionarPessoa(Pessoa pessoa){
 		pessoas.add(pessoa);
@@ -61,6 +60,11 @@ public class Elevador {
 			Pessoa pessoa = pessoas.next(); 
 			if(pessoa.getDestino() == this.andarAtual){
 				int espera = Math.abs(Orquestrador.contadorTempo - pessoa.getTempo());
+				try {
+					pessoasAtendidas.add(pessoa.clone());
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
 				pessoas.remove();
 				total++;
 				temposEsperaAtendidas.add(espera);
@@ -86,9 +90,6 @@ public class Elevador {
 		}
 		teto = maior;
 		chao = menor;
-		if(listaChamadas.contains(andarAtual)){
-			listaChamadas.remove(andarAtual);
-		}
 	}
 
 	public void adicionarChamada(int novo) {
@@ -105,18 +106,43 @@ public class Elevador {
 			}
 		}
 	}
-	
+
+	private Pessoa quemEntra(Queue<Pessoa> pessoasAndar) {
+		for (Pessoa pessoa : pessoasAndar) {
+			if(pessoa.getDirecao() == this.getStatus()){
+				return pessoa;
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * se parado, remove pessoas que chegaram ao destino; se nao lotado, 
+	 * adiciona pessoas que desejam seguir na mesma direção já programada;
+	 * se em movimento, continua acao do movimento programado
+	 */
 	public void executarAcao(){
 		if(this.acao==PARAR){
-//			remover pessoas do elevador
 			this.removerPessoas();
-			Andar andar = andares.get(this.getAndarAtual());
-			LinkedList<Pessoa> pessoas = andar.getPessoas();
-			while(!this.estaLotado() && !pessoas.isEmpty()){
-				this.adicionarPessoa(pessoas.poll());
+			Andar andar = andares.get(andarAtual);
+			Queue<Pessoa> pessoas = andar.getPessoas();
+			Pessoa pessoa = quemEntra(pessoas);
+			while(!this.estaLotado() && pessoa != null){
+				try {
+					this.adicionarPessoa(pessoa.clone());
+					pessoas.remove(pessoa);
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
+				pessoa = quemEntra(pessoas);
 			}
 		}else{
-			executarAcao(this.acao);
+			if(acao == SUBIR)
+				this.andarAtual++;
+			else
+				this.andarAtual--;
+			this.andaresPercorridos++;
+			atualizarDestinos();
 		}
 	}
 	
@@ -167,7 +193,7 @@ public class Elevador {
 	public int getTotalPessoasAtendidas() {
 		return temposEsperaAtendidas.size();
 	}
-	public LinkedList<Pessoa> getPessoas() {
+	public Queue<Pessoa> getPessoas() {
 		return this.pessoas;
 	}
 	public void setStatus(int status){
@@ -215,6 +241,24 @@ public class Elevador {
 	public int getId(){
 		return this.id;
 	}
+	public void setOrquestrador(Orquestrador o){
+		this.orquestrador = o;
+	}
+	/*
+	 * garante a entra de pessoas de acordo com a direcao do elevador
+	 */
+	public boolean alguemEntra() {
+		if(this.getStatus()==Elevador.SUBIR){
+			return orquestrador.listaChamadasSubida.contains(this.andarAtual);
+		}else{
+			return orquestrador.listaChamadasDescida.contains(this.andarAtual);
+		}
+	}
+	
+	public boolean alguemSai() {
+		return listaDestinos.contains(this.andarAtual);
+	}
+	
 	@Override
 	public String toString() {
 		String aux = String.format("\tId: %d Chao: %d Teto: %d AndarAtual: %d AndaresPercorridos: %d Status: %d \n\tAndaresDestino:[", id, chao, teto, andarAtual, andaresPercorridos, status);

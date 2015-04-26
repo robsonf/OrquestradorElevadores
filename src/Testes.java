@@ -13,8 +13,7 @@ public class Testes {
 		
 		ArrayList<Orquestrador> testes = new ArrayList<Orquestrador>(); 
 		for (int i = 0; i < TOTAL_BATERIAS; i++) {
-			testes.add(new Orquestrador(Orquestrador.HEURISTICA_DUMMY));
-//			testes.add(new Orquestrador(Orquestrador.HEURISTICA_ENERGIA));
+			testes.add(new Orquestrador());
 		}
 		for (Orquestrador o : testes) {
 			mediaTempos.add(o.getMediaTempos());

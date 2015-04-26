@@ -1,5 +1,13 @@
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Queue;
 
+/** 
+ * Para cada elevador verificar acao, se subir, continuar subindo, 
+ * chegando no último andar, descer. Se descer, continuar descendo, chegando 
+ * no primeiro andar, subir.
+ */
 
 public class Dummy extends Orquestrador {
 
@@ -10,30 +18,21 @@ public class Dummy extends Orquestrador {
 	public void tomarDecisoes(){
 		for (Elevador elevador : elevadores) {
 			int andarAtual = elevador.getAndarAtual();
-			Andar andar = andares.get(andarAtual);
-			LinkedList<Pessoa> pessoasAndar = andar.getPessoas();
-			LinkedList<Pessoa> pessoasElevador = elevador.getPessoas();
-			
-			// elevador pára esperando alguem sair
-			if (this.alguemSair(andarAtual, pessoasElevador)){
+			// elevador para caso alguem sobe ou desce
+			if (elevador.alguemSai() || elevador.alguemEntra()){
 				  elevador.setAcao(Elevador.PARAR);
 				  continue;
 			}
-			// elevador pessoas esperando no andar e elevador em movimento entao parar
-			if (!pessoasAndar.isEmpty() && elevador.getAcao() != Elevador.PARAR){
-				  elevador.setAcao(Elevador.PARAR);
-				  continue;
-			}
-//			remover pessoas do andar atual e adicionar no elevador
+			// se em movimento entao continua em movimento
 			if(elevador.getStatus() == Elevador.SUBIR){
-				if (andarAtual < Orquestrador.NUM_ANDARES - 1){
+				if (andarAtual < elevador.getTeto()){
 					elevador.setAcao(Elevador.SUBIR);	
 				}else{
 					elevador.setAcao(Elevador.DESCER);
 					elevador.setStatus(Elevador.DESCER);
 				}
 			}else{
-				if (andarAtual > 0){
+				if (andarAtual >  elevador.getChao()){
 					elevador.setAcao(Elevador.DESCER);
 				}else{
 					elevador.setAcao(Elevador.SUBIR);
@@ -42,15 +41,5 @@ public class Dummy extends Orquestrador {
 			}
 		}
 		
-	}
-
-	private boolean alguemSair(int andarAtual,
-			LinkedList<Pessoa> pessoasElevador) {
-		for (Pessoa pessoa : pessoasElevador) {
-			if(pessoa.getDestino() == andarAtual){
-				return true;
-			}
-		}
-		return false;
 	}
 }
