@@ -43,15 +43,15 @@ public class Andar {
 	public void adicionarPessoa(){
 		Random random = new Random();
 		int destino = -1;
-//		while(destino == -1){
-		while(destino == -1 || destino == Orquestrador.NUM_ANDARES - 1){
+		while(destino == -1){
+//		while(destino == -1 || destino == Orquestrador.NUM_ANDARES - 1){
 			int aux = random.nextInt(Orquestrador.NUM_ANDARES);
 			if(aux != this.id){
 				destino = aux;
 			}
 		}
-		if(this.id == Orquestrador.NUM_ANDARES-1)
-			return;
+//		if(this.id == Orquestrador.NUM_ANDARES-1)
+//			return;
 		pessoas.add(new Pessoa(this.id, destino,Orquestrador.contadorTempo));
 	}
 

@@ -4,14 +4,12 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /** 
- * Para cada elevador verificar acao, se subir, continuar subindo, 
- * chegando no último andar, descer. Se descer, continuar descendo, chegando 
- * no primeiro andar, subir.
+ * 
  */
 
-public class Dummy extends Orquestrador {
+public class ReducaoTempo extends Orquestrador {
 
-	public Dummy() {
+	public ReducaoTempo() {
 		super();
 	}
 

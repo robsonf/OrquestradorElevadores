@@ -9,25 +9,18 @@ public class Orquestrador {
 
 	/*
 	 * TODO: 
-	 * incrementar tempo de espera das pessoas;
-	 * ao remover pessoa adiciona seu tempo a lista de tempos percorridos.
 	 * 
 	 */
 	
-	public static final int NUM_ANDARES = 4;
-	public static final int NUM_ELEVADORES = 1;
+	public static final int NUM_ANDARES = 20;
+	public static final int NUM_ELEVADORES = 10;
 	// número de interações (unidades de tempo)
 	public static final int TEMPO_MAX_EXECUCAO = 100;
 	// a cada unidade de tempo pode surgir uma nova pessoa em cada andar com uma probabilidade de 50%
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 1;
 	// número inicial de pessoas por andar
-	public static final int MAX_PESSOAS_POR_ANDAR = 2;
+	public static final int MAX_PESSOAS_POR_ANDAR = 1;
 
-	public static final int HEURISTICA_DUMMY = 1;
-	public static final int HEURISTICA_ENERGIA = 2;
-	public static final int HEURISTICA_TEMPO = 3;
-	public static final int HEURISTICA_AMBOS = 4;
-	
 	private double mediaTempos = 0.0;
 	private double mediaDistancias = 0.0;
 	
@@ -42,6 +35,7 @@ public class Orquestrador {
 		contadorTempo = 0;
 		listaChamadasSubida = new LinkedHashSet<Integer>();
 		listaChamadasDescida = new LinkedHashSet<Integer>();
+		executar();
 	}
 
 	public void executar() {
@@ -57,6 +51,26 @@ public class Orquestrador {
 	}
 	
 	public void tomarDecisoes(){}
+
+	private void executarAcao(){
+		for (Elevador elevador : elevadores) {
+			elevador.executarAcao();
+			System.out.printf("\n###### acao: %d ######\n",elevador.getAcao());
+			System.out.println(this);
+		}
+	}
+	
+	private void atualizarCenario() {
+//		a cada turno adiciona uma nova pessoa em todos os andares
+		for (Andar andar : andares) {
+			Random random = new Random();
+			if(random.nextInt(100) + 1 <= PROBABILIDADE_CRESCIMENTO_POPULACAO){
+				andar.adicionarPessoa();
+				pessoasEsperando++;
+			}
+		}
+		atualizarChamadas();
+	}
 
 	/*
 	 *  atualizar listas de chamadas, não aloca elevadores
@@ -99,111 +113,6 @@ public void alocarElevadoresPorChamadas(){
 	}
 }
 */
-
-	private void executarAcao(){
-		for (Elevador elevador : elevadores) {
-			elevador.executarAcao();
-			System.out.printf("\n###### acao: %d ######\n",elevador.getAcao());
-			System.out.println(this);
-		}
-
-	}
-	private void heuristicaEnergia(){
-//		inicializa andares e elevadores
-		inicializarCenarioEnergia();
-		do {
-			contadorTempo++;
-			System.out.printf("\n######### INTERACAO : %d #########\n", contadorTempo);
-
-			/*
-			 *  distribui as chamadas igualmente para cada elevador
-			 *  cada elevador recebe o total igual a média de chamadas
-			 */
-			LinkedHashSet<Integer> chamadas = new LinkedHashSet<Integer>();
-			for (Andar andar : andares) {
-				if(!andar.estaVazio())
-					chamadas.add(andar.getId());
-			}
-			double mediaChamadas = (double)chamadas.size()/NUM_ELEVADORES;
-			for (Elevador elevador : elevadores) {
-				int contador = 0;
-				Iterator<Integer> it = chamadas.iterator();
-				while (it.hasNext() && contador < mediaChamadas) {
-					int chamada = (int) it.next();
-					elevador.adicionarChamada(chamada);
-					it.remove();
-					contador++;
-				}
-			}
-			/*
-			 * Para todos os andares, adiciona pessoas nos elevadores disponiveis
-			 */
-			for (Andar andar : andares) {
-				if(!andar.estaVazio()){
-					Queue<Pessoa> pessoas = andar.getPessoas();
-					ArrayList<Elevador> elevadoresDisponiveis = new ArrayList<Elevador>();
-					// verifica quais elevadores estao em cada andar
-					for (Elevador elevador : elevadores) {
-						int andarAtual = elevador.getAndarAtual();
-						if(andar.getId() == andarAtual){
-							if(!elevador.estaLotado())
-								elevadoresDisponiveis.add(elevador);
-						}
-					}
-					for (Elevador elevador : elevadoresDisponiveis) {
-						while(!elevador.estaLotado() && !pessoas.isEmpty()){
-							elevador.adicionarPessoa(pessoas.poll());
-							pessoasEsperando--;
-							pessoasElevador++;
-						}
-					}
-				}
-			}
-			/*
-			 * mover elevadores caso possuam chamadas ou destinos programados
-			 */
-			for (Elevador elevador : elevadores) {
-				if(elevador.estaProgramado()){
-					int andarAtual = elevador.getAndarAtual();
-					pessoasElevador -= elevador.removerPessoas();
-					System.out.println(String.format("###### remover pessoas do andar %d e adicionar no elevador ######", elevador.getAndarAtual()) );
-					System.out.println(this);
-					if(elevador.getStatus() == Elevador.SUBIR){
-						if (andarAtual < elevador.getTeto()){
-							elevador.executarAcao(Elevador.SUBIR);	
-						}else{
-							elevador.executarAcao(Elevador.DESCER);
-							elevador.setStatus(Elevador.DESCER);
-						}
-					}else{
-						if (andarAtual > elevador.getChao()){
-							elevador.executarAcao(Elevador.DESCER);
-						}else{
-							elevador.executarAcao(Elevador.SUBIR);
-							elevador.setStatus(Elevador.SUBIR);
-						}
-					}
-				}
-			}
-			atualizarCenario();
-		} while (contadorTempo < TEMPO_MAX_EXECUCAO);
-		System.out.println("######## ESTADO FINAL ########\n"+this);
-			
-//		impressao do relatorio final
-		relatorio();
-	}			
-
-	private void atualizarCenario() {
-//		a cada turno adiciona uma nova pessoa em todos os andares
-		for (Andar andar : andares) {
-			Random random = new Random();
-			if(random.nextInt(100) + 1 <= PROBABILIDADE_CRESCIMENTO_POPULACAO){
-				andar.adicionarPessoa();
-				pessoasEsperando++;
-			}
-		}
-		atualizarChamadas();
-	}
 
 	/**
 	 * cria o total de NUM_ANDARES de andares;
@@ -296,17 +205,6 @@ public void alocarElevadoresPorChamadas(){
 		this.mediaDistancias = mediaPercorrido;
 	}
 
-	private LinkedList<Pessoa> retonarTodasPessoas() {
-		LinkedList<Pessoa> lista = new LinkedList<Pessoa>();
-		for (Andar andar : andares) {
-			lista.addAll(andar.getPessoas());
-		}
-		for(Elevador elevador : elevadores){
-			lista.addAll(elevador.getPessoas());
-		}
-		return lista;
-	}
-
 	@Override
 	public String toString() {
 		String aux = "Andares:\n";
@@ -332,6 +230,6 @@ public void alocarElevadoresPorChamadas(){
 	
 	public static void main(String[] args) {
 		Orquestrador o = new Dummy();
-		o.executar();
+//		Orquestrador o = new ReducaoEnergia();
 	}
 }

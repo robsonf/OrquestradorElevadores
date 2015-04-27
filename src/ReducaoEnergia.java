@@ -4,20 +4,26 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 /** 
- * Para cada elevador verificar acao, se subir, continuar subindo, 
+ * Para cada elevador se não há chamadas ou pessoas dentro do elevador
+ * então permanece parado. Caso acao subir, continuar subindo, 
  * chegando no último andar, descer. Se descer, continuar descendo, chegando 
  * no primeiro andar, subir.
  */
 
-public class Dummy extends Orquestrador {
+public class ReducaoEnergia extends Orquestrador {
 
-	public Dummy() {
+	public ReducaoEnergia() {
 		super();
 	}
 
 	public void tomarDecisoes(){
 		for (Elevador elevador : elevadores) {
 			int andarAtual = elevador.getAndarAtual();
+			if(listaChamadasDescida.isEmpty() && listaChamadasDescida.isEmpty() && elevador.getPessoas().isEmpty()){
+				  elevador.setAcao(Elevador.PARAR);
+				  continue;
+
+			}
 			// se em movimento entao continua em movimento
 			if(elevador.getStatus() == Elevador.SUBIR){
 				if (andarAtual < elevador.getTeto()){

@@ -9,7 +9,7 @@ public class Elevador {
 	public static final int SUBIR = 1;
 	public static final int DESCER = -1;
 	public static final int PARAR = 0;
-	public static final int CAPACIDADE_MAX = 3;
+	public static final int CAPACIDADE_MAX = 5;
 	
 	private int id;
 	private int andarAtual;
