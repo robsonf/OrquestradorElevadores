@@ -28,10 +28,10 @@ public class Elevador {
 	private Orquestrador orquestrador;
 	
 	public Elevador(int id) {
-		this(id, 0, Elevador.SUBIR, Elevador.PARAR, 0, 0, Orquestrador.NUM_ANDARES-1);
+		this(id, 0, Elevador.PARAR, Elevador.PARAR, 0, 0, Orquestrador.NUM_ANDARES-1);
 	}
 	public Elevador(int id, int chao, int teto) {
-		this(id, chao, Elevador.SUBIR, Elevador.PARAR, 0, chao, teto);
+		this(id, chao, Elevador.PARAR, Elevador.PARAR, 0, chao, teto);
 	}
 	public Elevador(int id, int andarAtual, int status, int acao, int andaresPercorridos, int chao, int teto) {
 		super();
@@ -122,27 +122,29 @@ public class Elevador {
 	 * se em movimento, continua acao do movimento programado
 	 */
 	public void executarAcao(){
-		if(this.acao==PARAR){
-			this.removerPessoas();
-			Andar andar = andares.get(andarAtual);
-			Queue<Pessoa> pessoas = andar.getPessoas();
-			Pessoa pessoa = quemEntra(pessoas);
-			while(!this.estaLotado() && pessoa != null){
-				try {
-					this.adicionarPessoa(pessoa.clone());
-					pessoas.remove(pessoa);
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
+		if(this.status!=PARAR){
+			if(this.acao==PARAR){
+				removerPessoas();
+				Andar andar = this.andares.get(this.andarAtual);
+				Queue<Pessoa> pessoas = andar.getPessoas();
+				Pessoa pessoa = quemEntra(pessoas);
+				while(!estaLotado() && pessoa != null){
+					try {
+						adicionarPessoa(pessoa.clone());
+						pessoas.remove(pessoa);
+					} catch (CloneNotSupportedException e) {
+						e.printStackTrace();
+					}
+					pessoa = quemEntra(pessoas);
 				}
-				pessoa = quemEntra(pessoas);
+			}else{
+				if(acao == SUBIR)
+					this.andarAtual++;
+				else
+					this.andarAtual--;
+				this.andaresPercorridos++;
+				atualizarDestinos();
 			}
-		}else{
-			if(acao == SUBIR)
-				this.andarAtual++;
-			else
-				this.andarAtual--;
-			this.andaresPercorridos++;
-			atualizarDestinos();
 		}
 	}
 	
@@ -157,26 +159,8 @@ public class Elevador {
 		}
 		atualizarDestinos();
 	}
-/*	public void executarAcao(int acao, int andar){
-		if(this.status == SUBIR && acao == SUBIR){
-			if (andarAtual < this.chao){
-				this.andarAtual++;
-			}else{
-				System.out.println("............ULTIMO ANDAR..........");
-				this.status = DESCER;
-			}
-		}
-		if(this.status == DESCER && acao == DESCER){
-			if (andarAtual > 0){
-				this.andarAtual--;
-			}else {
-				System.out.println("............PRIMEIRO ANDAR..........");
-				this.status = SUBIR;
-			}
-		}
-		this.andaresPercorridos++;
-	}
-*/	public int getTempoTotalAtendidas() {
+	
+	public int getTempoTotalAtendidas() {
 		int parcial = 0;
 		for (int decorrido : temposEsperaAtendidas) {
 			parcial += decorrido;
@@ -240,6 +224,10 @@ public class Elevador {
 	}
 	public int getId(){
 		return this.id;
+	}
+	
+	public LinkedHashSet<Integer> getListaDestinos() {
+		return listaDestinos;
 	}
 	public void setOrquestrador(Orquestrador o){
 		this.orquestrador = o;

@@ -12,14 +12,14 @@ public class Orquestrador {
 	 * 
 	 */
 	
-	public static final int NUM_ANDARES = 20;
-	public static final int NUM_ELEVADORES = 10;
+	public static final int NUM_ANDARES = 4;
+	public static final int NUM_ELEVADORES = 1;
 	// número de interações (unidades de tempo)
 	public static final int TEMPO_MAX_EXECUCAO = 100;
 	// a cada unidade de tempo pode surgir uma nova pessoa em cada andar com uma probabilidade de 50%
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 1;
 	// número inicial de pessoas por andar
-	public static final int MAX_PESSOAS_POR_ANDAR = 1;
+	public static final int MAX_PESSOAS_POR_ANDAR = 2;
 
 	private double mediaTempos = 0.0;
 	private double mediaDistancias = 0.0;
@@ -168,10 +168,10 @@ public void alocarElevadoresPorChamadas(){
 	}
 
 	private void relatorio() {
-		String relatorio = "\n\n############## RELATORIO FINAL #############\n";
+		String relatorio = "\n\n############## RELATORIO PARCIAL #############\n";
 		int totalPessoasAtendidas = 0, totalPessoasEsperando = 0, totalAndaresPercorridos = 0, 
 				tempoPessoasAtendidas = 0, tempoPessoasEsperando = 0, tempoPessoasElevador = 0,
-				totalPessoasElevador = 0;
+				totalPessoasElevador = 0, totalEnergiaPessoasEsperando = 0;
 		for(Elevador elevador : elevadores){
 			int parcialAndares = elevador.getAndaresPercorridos();
 			relatorio += String.format("Total Percorrido Elevador[%d] = %d \n",elevador.getId(), parcialAndares);
@@ -185,6 +185,7 @@ public void alocarElevadoresPorChamadas(){
 		for (Andar andar : andares) {
 			tempoPessoasEsperando += andar.tempoPessoasEsperando();
 			totalPessoasEsperando += andar.getPessoas().size();
+			totalEnergiaPessoasEsperando += andar.energiaPessoasEsperando();
 		}
 		relatorio += String.format("\nTotal andares percorridos: %d \n",totalAndaresPercorridos);
 		relatorio += String.format("Total pessoas atendidas: %d \n",totalPessoasAtendidas);
@@ -196,7 +197,7 @@ public void alocarElevadoresPorChamadas(){
 		double mediaEspera = ((double)(tempoPessoasAtendidas+tempoPessoasEsperando+tempoPessoasElevador))/
 				(totalPessoasAtendidas+totalPessoasElevador+totalPessoasEsperando);
 		relatorio += String.format("\nMedia de espera: %.2f \n", mediaEspera);
-		double mediaPercorrido = ((double)totalAndaresPercorridos)/elevadores.size();
+		double mediaPercorrido = (((double)totalAndaresPercorridos)/elevadores.size()) + (totalEnergiaPessoasEsperando/elevadores.size());
 		relatorio += String.format("Media andares percorridos: %.2f \n",mediaPercorrido);
 		
 		System.out.println(relatorio);
@@ -229,7 +230,8 @@ public void alocarElevadoresPorChamadas(){
 	}
 	
 	public static void main(String[] args) {
-		Orquestrador o = new Dummy();
+//		Orquestrador o = new Dummy();
 //		Orquestrador o = new ReducaoEnergia();
+		Orquestrador o = new BaseLine();
 	}
 }

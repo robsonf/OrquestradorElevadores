@@ -17,6 +17,8 @@ public class Dummy extends Orquestrador {
 
 	public void tomarDecisoes(){
 		for (Elevador elevador : elevadores) {
+			if(elevador.getStatus()==Elevador.PARAR)
+				elevador.setStatus(Elevador.SUBIR);
 			int andarAtual = elevador.getAndarAtual();
 			// se em movimento entao continua em movimento
 			if(elevador.getStatus() == Elevador.SUBIR){
@@ -26,7 +28,7 @@ public class Dummy extends Orquestrador {
 					elevador.setAcao(Elevador.DESCER);
 					elevador.setStatus(Elevador.DESCER);
 				}
-			}else{
+			}else if (elevador.getStatus() == Elevador.DESCER){
 				if (andarAtual >  elevador.getChao()){
 					elevador.setAcao(Elevador.DESCER);
 				}else{
@@ -36,8 +38,8 @@ public class Dummy extends Orquestrador {
 			}
 			// elevador para caso alguem sobe ou desce
 			if (elevador.alguemSai() || (elevador.alguemEntra() && !elevador.estaLotado())){
-				  elevador.setAcao(Elevador.PARAR);
-				  continue;
+				elevador.setAcao(Elevador.PARAR);
+				continue;
 			}
 		}
 	}

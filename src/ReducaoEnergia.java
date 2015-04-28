@@ -22,7 +22,6 @@ public class ReducaoEnergia extends Orquestrador {
 			if(listaChamadasDescida.isEmpty() && listaChamadasDescida.isEmpty() && elevador.getPessoas().isEmpty()){
 				  elevador.setAcao(Elevador.PARAR);
 				  continue;
-
 			}
 			// se em movimento entao continua em movimento
 			if(elevador.getStatus() == Elevador.SUBIR){

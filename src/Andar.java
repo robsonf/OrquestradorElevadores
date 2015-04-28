@@ -44,14 +44,11 @@ public class Andar {
 		Random random = new Random();
 		int destino = -1;
 		while(destino == -1){
-//		while(destino == -1 || destino == Orquestrador.NUM_ANDARES - 1){
 			int aux = random.nextInt(Orquestrador.NUM_ANDARES);
 			if(aux != this.id){
 				destino = aux;
 			}
 		}
-//		if(this.id == Orquestrador.NUM_ANDARES-1)
-//			return;
 		pessoas.add(new Pessoa(this.id, destino,Orquestrador.contadorTempo));
 	}
 
@@ -61,6 +58,14 @@ public class Andar {
 			total += (Math.abs(pessoa.getDestino() - pessoa.getOrigem()) * PESO_ESPERA) + (Orquestrador.contadorTempo - pessoa.getTempo());
 		}
 		return total;
+	}
+
+	public double energiaPessoasEsperando(){
+		double total = 0.0;
+		for (Pessoa pessoa : pessoas) {
+			total += (Math.abs(pessoa.getDestino() - pessoa.getOrigem() + (Orquestrador.NUM_ANDARES/2)));
+		}
+		return total/Elevador.CAPACIDADE_MAX;
 	}
 	
 	public void removerPessoas(Queue<Pessoa> pessoas){
