@@ -15,7 +15,7 @@ public abstract class Orquestrador {
 	public static final int NUM_ANDARES = 20;
 	public static final int NUM_ELEVADORES = 10;
 	// número de interações (unidades de tempo)
-	public static final int TEMPO_MAX_EXECUCAO = 1000;
+	public static final int TEMPO_MAX_EXECUCAO = 100;
 	// a cada unidade de tempo pode surgir uma nova pessoa em cada andar com uma probabilidade de 50%
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 1;
 	// número inicial de pessoas por andar
@@ -190,7 +190,7 @@ public abstract class Orquestrador {
 	
 	public static void main(String[] args) {
 //		Orquestrador o = new Dummy();
-		Orquestrador o = new ReducaoEnergia();
-//		Orquestrador o = new BaseLine();
+//		Orquestrador o = new ReducaoEnergia();
+		Orquestrador o = new BaseLine();
 	}
 }

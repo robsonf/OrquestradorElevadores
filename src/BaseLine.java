@@ -28,22 +28,26 @@ public class BaseLine extends Orquestrador {
 			if(elevador.getStatus() == Elevador.PARAR){
 				if(!listaChamadasSubida.isEmpty()){
 					elevador.setStatus(Elevador.SUBIR);
-					continue;
+//					continue;
 				}
 				if(!listaChamadasDescida.isEmpty()){
 					elevador.setStatus(Elevador.DESCER);
-					continue;
+//					continue;
 				}
 			}
 			if (elevador.getStatus() == Elevador.SUBIR) {
-				if (andarAtual < elevador.getTeto()) {
+				if(andarAtual == elevador.getTeto()){
+					elevador.setAcao(Elevador.PARAR);
+				}else if (andarAtual < elevador.getTeto()) {
 					elevador.setAcao(Elevador.SUBIR);
 				} else {
 					elevador.setAcao(Elevador.DESCER);
 					elevador.setStatus(Elevador.DESCER);
 				}
 			} else {
-				if (andarAtual > elevador.getChao()) {
+				if(andarAtual == elevador.getChao()){
+					elevador.setAcao(Elevador.PARAR);
+				}else if (andarAtual > elevador.getChao()) {
 					elevador.setAcao(Elevador.DESCER);
 				} else {
 					elevador.setAcao(Elevador.SUBIR);

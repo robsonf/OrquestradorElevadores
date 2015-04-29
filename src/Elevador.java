@@ -127,6 +127,9 @@ public class Elevador {
 		if(this.status!=PARAR){
 			if(this.acao==PARAR){
 				removerPessoas();
+				if(this.andarAtual >= Orquestrador.NUM_ANDARES){
+					System.out.println("Erro");
+				}
 				Andar andar = this.andares.get(this.andarAtual);
 				Queue<Pessoa> pessoas = andar.getPessoas();
 				Pessoa pessoa = quemEntra(pessoas);
@@ -140,9 +143,11 @@ public class Elevador {
 					pessoa = quemEntra(pessoas);
 				}
 			}else{
-				if(acao == SUBIR)
+				if(acao == SUBIR){
+					if(this.andarAtual == 19)
+						System.out.println("merda");
 					this.andarAtual++;
-				else
+				}else
 					this.andarAtual--;
 				this.andaresPercorridos++;
 				atualizarDestinos();
