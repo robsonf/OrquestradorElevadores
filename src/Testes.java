@@ -9,12 +9,13 @@ public class Testes {
 	public static void main(String[] args) {
 		Hashtable<String, ArrayList <Double>> relatorios = new Hashtable<String, ArrayList <Double>>();
 		execucao(relatorios, "Dummy");
-//		execucao(relatorios, "Energia");
+		execucao(relatorios, "Energia");
 //		execucao(relatorios, "Tempo");
 		execucao(relatorios, "Base");
 		System.out.printf("\n\n\n########## RELATORIO FINAL ##############\n");
+		System.out.println(String.format("Andares: %d Elevadores: %d Capacidade: %d Crescimento: %d%%", Orquestrador.NUM_ANDARES, Orquestrador.NUM_ELEVADORES, Elevador.CAPACIDADE_MAX, Orquestrador.PROBABILIDADE_CRESCIMENTO_POPULACAO));
 		System.out.println("Dummy: " + relatorios.get("Dummy"));
-//		System.out.println("Energia: " + relatorios.get("Energia"));
+		System.out.println("Energia: " + relatorios.get("Energia"));
 //		System.out.println("Tempo: " + relatorios.get("Tempo"));
 		System.out.println("Base: " + relatorios.get("Base"));
 		
@@ -55,13 +56,9 @@ public class Testes {
 			acumulaTempo += o.getMediaTempos();
 			acumulaDistancia += o.getMediaDistancias();
 		}
-//		System.out.printf("\n\n\n########## RELATORIO FINAL ##############\n");
-//		System.out.printf("Media tempo: %.2f\n", acumulaTempo/TOTAL_BATERIAS);
-//		System.out.printf("Media distancia: %.2f\n", acumulaDistancia/TOTAL_BATERIAS);
 		medias.add(acumulaTempo/TOTAL_BATERIAS);
 		medias.add(acumulaDistancia/TOTAL_BATERIAS);
 
-//		System.out.println(relatorios.get(estrategia));
 		return relatorios;
 	}
 }

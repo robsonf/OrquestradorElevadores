@@ -10,7 +10,7 @@ import java.util.Queue;
 public class ReducaoAmbos extends Orquestrador {
 
 	public ReducaoAmbos() {
-		super();
+		super.inicializar();
 	}
 
 	public void tomarDecisoes(){

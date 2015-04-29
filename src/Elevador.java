@@ -26,6 +26,7 @@ public class Elevador {
 	private ArrayList<Andar> andares;
 	private Queue<Pessoa> pessoasAtendidas;
 	private Orquestrador orquestrador;
+	public LinkedHashSet<Integer> atendeChamadas;
 	
 	public Elevador(int id) {
 		this(id, 0, Elevador.PARAR, Elevador.PARAR, 0, 0, Orquestrador.NUM_ANDARES-1);
@@ -47,6 +48,7 @@ public class Elevador {
 		this.teto = teto;
 		this.listaDestinos = new LinkedHashSet<Integer>();
 		this.listaChamadas = new LinkedHashSet<Integer>();
+		this.atendeChamadas = new LinkedHashSet<Integer> ();
 		this.destinos = new boolean [Orquestrador.NUM_ANDARES];
 	}
 	public void adicionarPessoa(Pessoa pessoa){
@@ -232,6 +234,9 @@ public class Elevador {
 	public void setOrquestrador(Orquestrador o){
 		this.orquestrador = o;
 	}
+	public void setAtendeChamadas(LinkedHashSet<Integer> atendeChamadas ){
+		this.atendeChamadas = atendeChamadas;
+	}
 	/*
 	 * garante a entra de pessoas de acordo com a direcao do elevador
 	 */
@@ -250,10 +255,6 @@ public class Elevador {
 	@Override
 	public String toString() {
 		String aux = String.format("\tId: %d Chao: %d Teto: %d AndarAtual: %d AndaresPercorridos: %d Status: %d \n\tAndaresDestino:[", id, chao, teto, andarAtual, andaresPercorridos, status);
-//		for (int i = 0; i < destinos.length; i++) {
-//			if(this.destinos[i])
-//				aux += i + ", ";
-//		}
 		for (int destino : listaDestinos) {
 			aux += destino + ", ";
 		}
@@ -264,6 +265,10 @@ public class Elevador {
 		aux += String.format("] Pessoas [");
 		for (Pessoa p : pessoas) {
 			aux += p.toString() + ", ";
+		}
+		aux += String.format("] Atende Chamadas [");
+		for (int chamada : atendeChamadas) {
+			aux += chamada + ", ";
 		}
 		return aux + "]\n";
 	}

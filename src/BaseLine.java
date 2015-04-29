@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 public class BaseLine extends Orquestrador {
 
 	public BaseLine() {
-		super();
+		super.inicializar();
 	}
 
 	public void tomarDecisoes() {
@@ -26,17 +26,12 @@ public class BaseLine extends Orquestrador {
 			atualizarLimites(elevador);
 			// se parado, direciona o elevador para a mesma direcao do maior número de chamadas
 			if(elevador.getStatus() == Elevador.PARAR){
-				if(!listaChamadasDescida.isEmpty()){
-					if(!listaChamadasSubida.isEmpty()){
-						if(listaChamadasDescida.size()<listaChamadasSubida.size())
-							elevador.setStatus(Elevador.SUBIR);
-							continue;
-					}
-					elevador.setStatus(Elevador.DESCER);
-					continue;
-				}
 				if(!listaChamadasSubida.isEmpty()){
 					elevador.setStatus(Elevador.SUBIR);
+					continue;
+				}
+				if(!listaChamadasDescida.isEmpty()){
+					elevador.setStatus(Elevador.DESCER);
 					continue;
 				}
 			}

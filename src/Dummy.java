@@ -12,7 +12,7 @@ import java.util.Queue;
 public class Dummy extends Orquestrador {
 
 	public Dummy() {
-		super();
+		super.inicializar();
 	}
 
 	public void tomarDecisoes(){

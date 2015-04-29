@@ -5,22 +5,24 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
 
-public class Orquestrador {
+public abstract class Orquestrador {
 
 	/*
 	 * TODO: 
 	 * 
 	 */
 	
-	public static final int NUM_ANDARES = 4;
-	public static final int NUM_ELEVADORES = 1;
+	public static final int NUM_ANDARES = 20;
+	public static final int NUM_ELEVADORES = 10;
 	// número de interações (unidades de tempo)
-	public static final int TEMPO_MAX_EXECUCAO = 100;
+	public static final int TEMPO_MAX_EXECUCAO = 1000;
 	// a cada unidade de tempo pode surgir uma nova pessoa em cada andar com uma probabilidade de 50%
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 1;
 	// número inicial de pessoas por andar
 	public static final int MAX_PESSOAS_POR_ANDAR = 2;
 
+	public static final boolean exibirLogs = false;
+	
 	private double mediaTempos = 0.0;
 	private double mediaDistancias = 0.0;
 	
@@ -29,20 +31,23 @@ public class Orquestrador {
 	protected ArrayList<Elevador> elevadores;
 	protected LinkedHashSet<Integer> listaChamadasSubida;
 	protected LinkedHashSet<Integer> listaChamadasDescida;
-	private int tempoDecorrido = 0 , tempoTotal = 0, pessoasEsperando = 0, pessoasElevador = 0;
 
-	public Orquestrador() {
+//	public Orquestrador() {
+//	}
+	
+	public void inicializar(){
 		contadorTempo = 0;
 		listaChamadasSubida = new LinkedHashSet<Integer>();
 		listaChamadasDescida = new LinkedHashSet<Integer>();
 		executar();
 	}
-
 	public void executar() {
 		inicializarCenario();
 		do {
 			contadorTempo++;
-			System.out.printf("\n######### ITERACAO : %d #########\n", contadorTempo);
+			if(exibirLogs){			
+				System.out.printf("######### ITERACAO : %d #########", contadorTempo);
+			}
 			atualizarCenario();
 			tomarDecisoes();
 			executarAcao();
@@ -50,13 +55,15 @@ public class Orquestrador {
 		relatorio();
 	}
 	
-	public void tomarDecisoes(){}
+	public abstract void tomarDecisoes();
 
 	private void executarAcao(){
 		for (Elevador elevador : elevadores) {
 			elevador.executarAcao();
-			System.out.printf("\n###### acao: %d ######\n",elevador.getAcao());
-			System.out.println(this);
+			if(exibirLogs){
+				System.out.printf("\n###### acao: %d ######\n",elevador.getAcao());
+				System.out.println(this);
+			}
 		}
 	}
 	
@@ -66,7 +73,6 @@ public class Orquestrador {
 			Random random = new Random();
 			if(random.nextInt(100) + 1 <= PROBABILIDADE_CRESCIMENTO_POPULACAO){
 				andar.adicionarPessoa();
-				pessoasEsperando++;
 			}
 		}
 		atualizarChamadas();
@@ -89,30 +95,10 @@ public class Orquestrador {
 				}
 			}
 		}
+		notificarAtualizacaoChamadas();
 	}
-
-/*  
- * distribui as chamadas igualmente para cada elevador cada elevador recebe o total igual a média de chamadas
-
-public void alocarElevadoresPorChamadas(){	 
-	LinkedHashSet<Integer> chamadas = new LinkedHashSet<Integer>();
-	for (Andar andar : andares) {
-		if(!andar.estaVazio())
-			chamadas.add(andar.getId());
-	}
-	double mediaChamadas = (double)chamadas.size()/NUM_ELEVADORES;
-	for (Elevador elevador : elevadores) {
-		int contador = 0;
-		Iterator<Integer> it = chamadas.iterator();
-		while (it.hasNext() && contador < mediaChamadas) {
-			int chamada = (int) it.next();
-			elevador.adicionarChamada(chamada);
-			it.remove();
-			contador++;
-		}
-	}
-}
-*/
+	
+	public void notificarAtualizacaoChamadas(){}
 
 	/**
 	 * cria o total de NUM_ANDARES de andares;
@@ -133,38 +119,10 @@ public void alocarElevadoresPorChamadas(){
 			e.setOrquestrador(this);
 			elevadores.add(e);
 		}
-		for (Andar andar : andares) {
-			pessoasEsperando += andar.getPessoas().size();
+		if(exibirLogs){
+			System.out.println("###### estado inicial ######");
+			System.out.println(this);
 		}
-
-		System.out.println("###### estado inicial ######");
-		System.out.println(this);
-	}
-
-	/**
-	 * cria o total de NUM_ANDARES de andares;
-	 * inicialmente, cada elevador é responsável por atuar entre um intervalo
-	 * de andares (chao e teto) alterado conforme destino dos passageiros.
-	 * adiciona pessoas aleatoriamente respeitando um MAX_PESSOAS_POR_ANDAR
-	 */
-	private void inicializarCenarioEnergia() {
-		andares = new ArrayList<Andar>();
-		elevadores = new ArrayList<Elevador>();
-
-		Random random = new Random();
-		for (int i = 0; i < NUM_ANDARES; i++) {
-			int totalPessoas = random.nextInt(MAX_PESSOAS_POR_ANDAR);
-			andares.add(new Andar(i, totalPessoas));
-		}
-		for (int i = 0; i < NUM_ELEVADORES; i++) {
-			elevadores.add(new Elevador(i, i*(NUM_ANDARES/NUM_ELEVADORES), ((i+1)*(NUM_ANDARES/NUM_ELEVADORES)-1)));
-		}
-		for (Andar andar : andares) {
-			pessoasEsperando+= andar.getPessoas().size();
-		}
-
-		System.out.println("###### estado inicial ######");
-		System.out.println(this);
 	}
 
 	private void relatorio() {
@@ -200,7 +158,9 @@ public void alocarElevadoresPorChamadas(){
 		double mediaPercorrido = (((double)totalAndaresPercorridos)/elevadores.size()) + (totalEnergiaPessoasEsperando/elevadores.size());
 		relatorio += String.format("Media andares percorridos: %.2f \n",mediaPercorrido);
 		
-		System.out.println(relatorio);
+		if(exibirLogs){
+			System.out.println(relatorio);
+		}
 		
 		this.mediaTempos = mediaEspera;
 		this.mediaDistancias = mediaPercorrido;
@@ -212,13 +172,12 @@ public void alocarElevadoresPorChamadas(){
 		for (int i = andares.size()-1; i >= 0; i--) {
 			aux += andares.get(i);
 		}
-		aux += "Elevadores:\n";
+		aux += "Elevadores:";
 		for (Elevador e : elevadores) {
-			aux += e + "\n";
+			aux += "\n" + e;
 		}
 		aux += "Chamadas Subida: " + listaChamadasSubida + "\n";
 		aux += "Chamadas Descida: " + listaChamadasDescida + "\n";
-		aux += String.format("Pessoas Esperando: %d, Pessoas no Elevador: %d\n\n", pessoasEsperando, pessoasElevador);
 		return aux;
 	}
 
@@ -231,7 +190,7 @@ public void alocarElevadoresPorChamadas(){
 	
 	public static void main(String[] args) {
 //		Orquestrador o = new Dummy();
-//		Orquestrador o = new ReducaoEnergia();
-		Orquestrador o = new BaseLine();
+		Orquestrador o = new ReducaoEnergia();
+//		Orquestrador o = new BaseLine();
 	}
 }
