@@ -7,19 +7,14 @@ import java.util.Random;
 
 public abstract class Orquestrador {
 
-	/*
-	 * TODO: 
-	 * 
-	 */
-	
 	public static final int NUM_ANDARES = 20;
 	public static final int NUM_ELEVADORES = 10;
 	// número de interações (unidades de tempo)
-	public static final int TEMPO_MAX_EXECUCAO = 100;
+	public static final int TEMPO_MAX_EXECUCAO = 1000;
 	// a cada unidade de tempo pode surgir uma nova pessoa em cada andar com uma probabilidade de 50%
 	public static final int PROBABILIDADE_CRESCIMENTO_POPULACAO = 1;
 	// número inicial de pessoas por andar
-	public static final int MAX_PESSOAS_POR_ANDAR = 2;
+	public static final int MAX_PESSOAS_POR_ANDAR = 0;
 
 	public static final boolean exibirLogs = false;
 	
@@ -32,9 +27,6 @@ public abstract class Orquestrador {
 	protected LinkedHashSet<Integer> listaChamadasSubida;
 	protected LinkedHashSet<Integer> listaChamadasDescida;
 
-//	public Orquestrador() {
-//	}
-	
 	public void inicializar(){
 		contadorTempo = 0;
 		listaChamadasSubida = new LinkedHashSet<Integer>();
@@ -110,7 +102,10 @@ public abstract class Orquestrador {
 
 		Random random = new Random();
 		for (int i = 0; i < NUM_ANDARES; i++) {
-			int totalPessoas = random.nextInt(MAX_PESSOAS_POR_ANDAR);
+			int totalPessoas = 0;
+			if(MAX_PESSOAS_POR_ANDAR != 0){
+				totalPessoas = random.nextInt(MAX_PESSOAS_POR_ANDAR);
+			}
 			andares.add(new Andar(i, totalPessoas));
 		}
 		for (int i = 0; i < NUM_ELEVADORES; i++) {
@@ -190,7 +185,7 @@ public abstract class Orquestrador {
 	
 	public static void main(String[] args) {
 //		Orquestrador o = new Dummy();
+		Orquestrador o = new ReducaoTempo();
 //		Orquestrador o = new ReducaoEnergia();
-		Orquestrador o = new BaseLine();
 	}
 }
